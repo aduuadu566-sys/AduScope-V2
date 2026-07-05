@@ -16,6 +16,12 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Set up Java 17 (Fix for Gradle/Android Build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -31,11 +37,10 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Accept Android Licenses (Fix for Licenses Error)
+      - name: Accept Android Licenses
         run: |
           mkdir -p -v "$ANDROID_SDK_ROOT/licenses"
           echo -e "\n2c4a34e8d4f11933d36e93902d67d480e3096b08\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f291d\n35105006d6494e6312cf4115179553fe9101c60f\ne9ac30d355da19283111b457653d8b695b72973e\n986585c539845da543a145ee0d0da2400e14d1a9\n24333f1a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
-          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_SDK_ROOT/licenses/android-sdk-preview-license"
           yes | flutter doctor --android-licenses || true
 
       - name: Install Python dependencies
