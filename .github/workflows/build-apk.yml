@@ -47,11 +47,11 @@ jobs:
         run: |
           if [ ! -f requirements.txt ]; then touch requirements.txt; fi
           mkdir -p assets
-          pip install flet
+          pip install --upgrade flet
 
-      - name: Build the APK (Corrected command for new Flet version)
+      - name: Force Build APK (Fix for EOFError)
         run: |
-          flet build apk
+          yes | flet build apk || echo "y" | flet build apk
 
       - name: Upload the APK so you can download it
         uses: actions/upload-artifact@v4
