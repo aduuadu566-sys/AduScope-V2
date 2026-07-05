@@ -43,21 +43,12 @@ jobs:
           echo -e "\n2c4a34e8d4f11933d36e93902d67d480e3096b08\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f291d\n35105006d6494e6312cf4115179553fe9101c60f\ne9ac30d355da19283111b457653d8b695b72973e\n986585c539845da543a145ee0d0da2400e14d1a9\n24333f1a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
           yes | flutter doctor --android-licenses || true
 
-      - name: Install Python dependencies
+      - name: Requirements and Assets Check (Fix for Not Found Errors)
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Create Assets Folder (Fix for Flet Build Error)
-        run: |
+          if [ ! -f requirements.txt ]; then touch requirements.txt; fi
           mkdir -p assets
+          pip install flet
 
-      - name: Build the APK
+      - name: Build the APK using Python Module directly
         run: |
-          flet build apk
-
-      - name: Upload the APK so you can download it
-        uses: actions/upload-artifact@v4
-        with:
-          name: AduScope-APK
-          path: build/apk/*.apk
+          python -m flet build apk
