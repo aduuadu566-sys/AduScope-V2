@@ -15,7 +15,7 @@ import os
 #   setx OPENROUTER_API_KEY "sk-or-v1-..."             (windows)
 # Get a free key at https://openrouter.ai (sign up, no card needed)
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-AI_MODEL = "google/gemini-2.0-flash-exp:free"  # free tier, strong multilingual quality
+AI_MODEL =  "meta-llama/llama-3.3-70b-instruct:free" # free tier, strong multilingual quality
 MAX_TOKENS = 1024
 
 TOTAL_QUESTIONS = 10
