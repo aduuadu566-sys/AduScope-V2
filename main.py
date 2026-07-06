@@ -80,7 +80,7 @@ def main(page: ft.Page):
     # ------------------------------------------------------------------
     def screen_splash():
         logo_circle = ft.Container(
-            content=ft.Icon(ft.icons.AUTO_AWESOME, size=54, color="white"),
+            content=ft.Icon(ft.Icons.AUTO_AWESOME, size=54, color="white"),
             width=110, height=110, border_radius=55,
             bgcolor=theme["primary"], alignment=ft.alignment.center,
             opacity=0, scale=0.7,
