@@ -196,11 +196,7 @@ def main(page: ft.Page):
     # SCREEN 3: Welcome
     # ------------------------------------------------------------------
     def screen_welcome():
-        welcome_msg = (
-            f"እንኳን ደህና መጡ {state.name}፣ ወደ ልዩው ተሰጥኦ መርማሪ AduScope በሰላም ተቀላቅለዋል!"
-            if state.language_code == "am"
-            else f"Welcome, {state.name}! You've just joined AduScope — let's uncover your talent."
-        )
+        welcome_msg = f"✨ {state.name} ✨"
 
         content = [
             ft.Container(height=100),
