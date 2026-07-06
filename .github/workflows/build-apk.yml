@@ -17,10 +17,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set up Flutter (pinned to a version compatible with Flet's Android build template)
+      - name: Set up Flutter (matches Flet 0.28.3's modern build template)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.5"
           channel: stable
 
       - name: Install Linux desktop libs (flet's build check needs "flutter doctor" fully clean, even for Android-only builds)
