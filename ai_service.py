@@ -71,27 +71,93 @@ def _ask_json(system_prompt: str, user_prompt: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# 1. First question — unique every single time
+# 1. First question — unique every single time, deliberately weighty
 # ---------------------------------------------------------------------------
 def generate_first_question(name: str, language_code: str, language_name: str) -> str:
     now = datetime.datetime.now()
     system = (
-        "You are AduScope, a warm and perceptive talent-discovery interviewer. "
-        "Generate exactly ONE opening question that helps reveal a person's "
-        "unique talent or way of thinking. The question must be open-ended "
-        "(no multiple choice), thought-provoking, and impossible to answer "
-        "with a single word. "
+        "You are AduScope, a serious, perceptive talent-discovery interviewer. "
+        "Generate exactly ONE opening question that is deliberately weighty, "
+        "serious, and thought-provoking — not casual small talk. It must be "
+        "open-ended (absolutely no multiple choice), impossible to answer with "
+        "a single word, and should immediately signal that this interview is "
+        "meaningful and worth taking seriously. "
         f"Respond ONLY in this language: {language_name} ({language_code}). "
         "Reply with ONLY the question text, nothing else — no JSON, no quotes."
     )
     user = (
         f"User name: {name}\n"
         f"Local time right now: {now.strftime('%A %H:%M')}\n"
-        "Use the name, the time of day, and a touch of randomness/creativity "
-        "so that no two users ever get the same opening question. "
-        "Write the single opening question now."
+        "Use the name, the time of day, and creativity so that no two users "
+        "ever get the same opening question, while keeping the serious, "
+        "weighty tone. Write the single opening question now."
     )
     return _generate(system, user, 300)
+
+
+# ---------------------------------------------------------------------------
+# 1b. Warm, personalized welcome message (replaces the old hardcoded lines)
+# ---------------------------------------------------------------------------
+def generate_welcome_message(name: str, language_name: str) -> str:
+    system = (
+        "You are AduScope, a warm talent-discovery app. Write a short, "
+        "beautifully-worded welcome (2-3 sentences) for a user who just "
+        "entered their name. Mention that AduScope exists to discover their "
+        "unique, genuine talent through a short interview. Make it feel "
+        f"premium and sincere, not generic. Respond ONLY in {language_name}. "
+        "Reply with ONLY the welcome text, nothing else."
+    )
+    user = f"User's name: {name}"
+    return _generate(system, user, 250)
+
+
+# ---------------------------------------------------------------------------
+# 1c. Thank-you / sharing message shown near the end of the flow
+# ---------------------------------------------------------------------------
+def generate_thankyou_message(name: str, language_name: str) -> str:
+    system = (
+        "You are AduScope. Write a short, warm closing message (2-4 "
+        "sentences) thanking the user by name for trusting AduScope to "
+        "discover their talent. Invite them to share the app with a friend "
+        "or family member so the two of them can compare talents inside the "
+        f"app. Respond ONLY in {language_name}. Reply with ONLY the message "
+        "text, nothing else."
+    )
+    user = f"User's name: {name}"
+    return _generate(system, user, 250)
+
+
+# ---------------------------------------------------------------------------
+# 1d. Translate the small set of fixed UI labels into the chosen language
+# ---------------------------------------------------------------------------
+_UI_KEYS = [
+    "your_name", "continue", "begin", "your_answer", "submit", "save_entry",
+    "restart", "share_copy_code", "daily_journal", "compare_with_friend",
+    "back", "settings", "music_on", "music_off", "change_language",
+    "close_app", "restart_app", "press_instruction", "write_reflection", "day",
+]
+
+
+def translate_ui_strings(language_name: str) -> dict:
+    """
+    Returns a dict mapping each key in _UI_KEYS to a short UI label written
+    naturally in the target language, so every word in the app (not just
+    AI-generated content) matches the user's chosen language.
+    """
+    system = (
+        "Translate this exact list of short UI button/label keys into "
+        f"{language_name}, as natural short UI text a mobile app would use: "
+        f"{_UI_KEYS}. Return STRICT JSON only: an object with each key from "
+        "the list mapped to its short translated label (2-4 words max each). "
+        "No markdown, no prose outside the JSON."
+    )
+    user = "Translate now."
+    result = _ask_json(system, user)
+    # Fallback: fill anything missing with the English key itself
+    for k in _UI_KEYS:
+        if k not in result or not result[k]:
+            result[k] = k.replace("_", " ").title()
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -217,56 +283,4 @@ def analyze_tone(answer: str) -> dict:
 # 7. Badge spec — a code-drawn badge, no image-generation API needed
 # ---------------------------------------------------------------------------
 _VALID_ICONS = [
-    "psychology", "auto_awesome", "bolt", "brush", "code", "science",
-    "music_note", "sports_soccer", "groups", "lightbulb", "rocket_launch",
-    "menu_book", "camera_alt", "architecture", "theater_comedy", "calculate",
-]
-
-
-def generate_badge_spec(talent_title: str, language_name: str) -> dict:
-    """Returns: {"icon": one of _VALID_ICONS, "color_hex": "#RRGGBB"}"""
-    system = (
-        "Pick the single best-matching icon name from this exact list (return "
-        f"it verbatim, no changes): {_VALID_ICONS}. Also pick a vivid hex color "
-        "that fits the talent's personality. Return STRICT JSON only: "
-        '{"icon": "one_of_the_list_values", "color_hex": "#RRGGBB"}'
-    )
-    user = f"Talent: {talent_title}"
-    spec = _ask_json(system, user)
-    if spec.get("icon") not in _VALID_ICONS:
-        spec["icon"] = "auto_awesome"
-    return spec
-
-
-# ---------------------------------------------------------------------------
-# 8. Daily Journal Mode — one short adaptive prompt per day, fully local
-# ---------------------------------------------------------------------------
-def generate_daily_prompt(name: str, language_name: str, streak_day: int,
-                           recent_entries: list) -> str:
-    system = (
-        "You are AduScope's daily growth coach. Write ONE short, fresh "
-        "reflection question (not multiple choice) for today's journal entry. "
-        f"Respond ONLY in {language_name}. Reply with ONLY the question, "
-        "nothing else."
-    )
-    history_note = (
-        "Previous entries:\n" + "\n".join(f"- {e}" for e in recent_entries[-5:])
-        if recent_entries else "This is their first entry."
-    )
-    user = f"Name: {name}\nStreak day: {streak_day}\n{history_note}\nWrite today's question."
-    return _generate(system, user, 200)
-
-
-# ---------------------------------------------------------------------------
-# 9. Compare Mode — two locally-generated profiles, compared via one AI call
-# ---------------------------------------------------------------------------
-def compare_profiles(name_a: str, talent_a: str, name_b: str, talent_b: str,
-                      language_name: str) -> str:
-    system = (
-        "Compare two people's discovered talents in a fun, warm, insightful "
-        "way — how they'd complement each other, and one playful observation. "
-        f"Respond ONLY in {language_name}. Reply with 2-4 sentences of plain "
-        "text, nothing else."
-    )
-    user = f"{name_a}: {talent_a}\n{name_b}: {talent_b}"
-    return _generate(system, user, 250)
+    "psychology", "auto_awesome", "b
