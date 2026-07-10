@@ -1,5 +1,8 @@
 name: Build AduScope APK
 
+# Runs automatically every time you push code to GitHub, and can also
+# be triggered manually from the "Actions" tab with the button
+# "Run workflow".
 on:
   push:
     branches: [ main ]
@@ -34,10 +37,11 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      - name: Bake the API key into config.py (env vars set here don't survive into the compiled APK)
+        run: sed -i "s|__OPENROUTER_API_KEY__|${{ secrets.OPENROUTER_API_KEY }}|" config.py
+
       - name: Build the APK
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: flet build apk
+        run: flet build apk --project "AduScope" --product "AduScope"
 
       - name: Upload the APK so you can download it
         uses: actions/upload-artifact@v4
