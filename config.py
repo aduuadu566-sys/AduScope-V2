@@ -3,19 +3,18 @@ AduScope - App Configuration
 Central place for constants: supported languages, API settings, theme colors.
 """
 
-import os
-
 # ---------------------------------------------------------------------------
 # AI Configuration (OpenRouter — free tier, no credit card, works everywhere,
 # no VPN needed since requests are routed through OpenRouter's servers)
 # ---------------------------------------------------------------------------
-# NEVER hardcode your real key here. Set it as an environment variable before
-# running the app:
-#   export OPENROUTER_API_KEY="sk-or-v1-..."          (mac/linux)
-#   setx OPENROUTER_API_KEY "sk-or-v1-..."             (windows)
-# Get a free key at https://openrouter.ai (sign up, no card needed)
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-AI_MODEL =  "meta-llama/llama-3.3-70b-instruct:free" # free tier, strong multilingual quality
+# IMPORTANT: this placeholder gets replaced with the real key at BUILD TIME
+# by the GitHub Actions workflow (which reads it from the repo Secret). This
+# is required because environment variables set during the CI build do NOT
+# carry over into the compiled APK that runs on your phone — the key must be
+# baked into the source before `flet build apk` packages the app.
+# Never type your real key here directly in a public/shared repo.
+OPENROUTER_API_KEY = "__OPENROUTER_API_KEY__"
+AI_MODEL = "meta-llama/llama-3.3-70b-instruct:free"  # actively available free model, strong multilingual quality
 MAX_TOKENS = 1024
 
 TOTAL_QUESTIONS = 10
