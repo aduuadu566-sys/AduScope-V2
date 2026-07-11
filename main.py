@@ -79,14 +79,14 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.DARK if is_night else ft.ThemeMode.LIGHT
 
     # -- Background music (best-effort; CC BY 4.0, Kevin MacLeod / incompetech.com)
-    music = ft.Audio(src=MUSIC_URL, autoplay=True, volume=0.35)
+    music = ft.Audio(src=MUSIC_URL, autoplay=False, volume=0.35)
     page.overlay.append(music)
 
     def toggle_music(e=None):
         state.music_on = not state.music_on
         try:
             if state.music_on:
-                music.resume()
+                music.play()
             else:
                 music.pause()
         except Exception:
