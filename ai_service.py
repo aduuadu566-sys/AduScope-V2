@@ -283,6 +283,8 @@ def analyze_tone(answer: str) -> dict:
 # 7. Badge spec — a code-drawn badge, no image-generation API needed
 # ---------------------------------------------------------------------------
 _VALID_ICONS = [
-    "psychology", "auto_awesome", "star", "military_tech", "workspace_premium"
+    "psychology", "auto_awesome", "bolt", "brush", "code", "science",
+    "music_note", "sports_soccer", "groups", "lightbulb", "rocket_launch",
+    "menu_book", "camera_alt", "architecture", "theater_comedy", "calculate",
 ]
 
