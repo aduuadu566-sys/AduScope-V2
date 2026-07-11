@@ -43,7 +43,7 @@ class AppState:
         self.question_index = 0
         self.result = None
         self.ui = {}          # translated UI labels for the chosen language
-        self.music_on = True  # persists only for this session
+        self.music_on = False  # off by default — user can enable it in Settings
 
 
 DEFAULT_UI = {
